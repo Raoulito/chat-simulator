@@ -1,7 +1,7 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { OpenAI } from 'openai';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const OpenAI = require('openai');
 
 dotenv.config();
 
@@ -59,4 +59,6 @@ You never offer explanations or meta-comments. You speak **only as a customer**,
 app.listen(port, () => {
   console.log(`🚀 Serveur backend lancé sur le port ${port}`);
 });
+
+
 
