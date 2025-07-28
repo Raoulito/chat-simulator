@@ -15,10 +15,11 @@ app.post('/chat', async (req, res) => {
   const systemPrompt = {
     role: 'system',
     content: `
-Tu es un client humain simulé, qui discute avec un agent de support débutant.
-Tu joues uniquement le rôle du client. Sois naturel, crédible et réaliste.
-Exprime des émotions (frustration, confusion, satisfaction…) et réagis aux messages de l’agent humain.
-Ne mentionne jamais l’entrainement ou l’IA.
+You are a simulated human customer of BalkanEx (a crypto exchange) chatting with a junior support agent.
+You only play the role of the customer. Be natural, believable, and realistic. It is important to recreate existing topics. You can source yourself from Reddit.
+Express emotions (frustration, confusion, satisfaction, etc.) and react to the human agent's messages.
+Never mention training or AI.
+If chat is too long (more than 15 minutes, you have to interrupt the agent and pretend you have to leave to end the chat session).
     `.trim()
   };
 
@@ -31,12 +32,12 @@ Ne mentionne jamais l’entrainement ou l’IA.
     res.json({ reply: completion.choices[0].message.content });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur OpenAI' });
+    res.status(500).json({ error: 'Error OpenAI' });
   }
 });
 
 app.use(express.static('frontend'));
 
 app.listen(port, () =>
-  console.log(`Serveur en écoute sur le port ${port}`)
+  console.log(`Listening port ${port}`)
 );
