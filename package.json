@@ -1,9 +1,7 @@
 {
-  "name": "chat-backend",
+  "name": "chat-simulator",
   "version": "1.0.0",
-  "description": "Backend for AI chat with OpenAI and Express",
-  "main": "index.js",
-  "type": "module",
+  "main": "backend/index.js",
   "scripts": {
     "start": "node backend/index.js"
   },
