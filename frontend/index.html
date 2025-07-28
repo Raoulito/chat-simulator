@@ -1,59 +1,87 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Chat sim - BalkanEx</title>
+  <meta charset="UTF-8" />
+  <title>ChatSim</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    .chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; margin-bottom: 10px; }
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; }
+    .chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; }
     .message { margin: 5px 0; }
     .agent { text-align: right; color: blue; }
     .client { text-align: left; color: green; }
+    #input { width: 80%; padding: 8px; }
   </style>
 </head>
 <body>
-  <h1>Chat simulator CS</h1>
+  <h1>ChatSim</h1>
   <div class="chat" id="chat"></div>
-  <input type="text" id="input" placeholder="Type here..." style="width:80%">
-  <button onclick="send()">Send</button>
+  <input id="input" placeholder="Type your reply..." autocomplete="off" />
+  <button id="sendBtn">Envoyer</button>
 
   <script>
     const chatDiv = document.getElementById('chat');
     const input = document.getElementById('input');
+    const sendBtn = document.getElementById('sendBtn');
+
     const messages = [];
 
-    function appendMessage(role, text){
+    function appendMessage(role, text) {
       const div = document.createElement('div');
-      div.className = `message ${role}`;
-      div.innerText = text;
+      div.className = 'message ' + role;
+      div.textContent = text;
       chatDiv.appendChild(div);
       chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
-    async function send(){
-      if (!input.value) return;
-      appendMessage('agent', input.value);
-      messages.push({ role: 'user', content: input.value });
+    async function sendMessage() {
+      const content = input.value.trim();
+      if (!content) return;
+
+      appendMessage('agent', content);
+      messages.push({ role: 'user', content });
+
       input.value = '';
-      const res = await fetch('/chat', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ messages })
-      });
-      const data = await res.json();
-      appendMessage('client', data.reply);
-      messages.push({ role: 'assistant', content: data.reply });
+      input.disabled = true;
+      sendBtn.disabled = true;
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages }),
+        });
+
+        const data = await res.json();
+        appendMessage('client', data.reply);
+        messages.push({ role: 'assistant', content: data.reply });
+      } catch (err) {
+        appendMessage('client', 'serv error');
+      }
+
+      input.disabled = false;
+      sendBtn.disabled = false;
+      input.focus();
     }
 
+    sendBtn.onclick = sendMessage;
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Démarrer la conversation avec un message client
     window.onload = async () => {
-      const res = await fetch('/chat', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ messages: [] })
-      });
-      const data = await res.json();
-      appendMessage('client', data.reply);
-      messages.push({ role: 'assistant', content: data.reply });
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [] }),
+        });
+        const data = await res.json();
+        appendMessage('client', data.reply);
+        messages.push({ role: 'assistant', content: data.reply });
+      } catch {
+        appendMessage('client', 'server err at boot');
+      }
     };
   </script>
 </body>
